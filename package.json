@@ -1,0 +1,20 @@
+{
+  "name": "toolkittest",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/test.js"
+  },
+  "author": "Mohammad Saddam",
+  "license": "MIT",
+  "description": "",
+  "dependencies": {
+    "@mohammadsaddam-dev/hubspot-toolkit": "^0.3.2",
+    "axios": "^1.13.2",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "p-retry": "^7.1.0"
+  }
+}
