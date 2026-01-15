@@ -1,13 +1,6 @@
 import { client as hs } from "../index.js";
 
 async function testFunction() {
-  // const properties = [
-  //   "email",
-  //   "firstname",
-  //   "lastname",
-  //   "hs_object_id",
-  //   "lastmodifieddate",
-  // ];
   try {
     const response = await hs.contacts.getAllContacts([], 100);
     console.log("Contact length", response.length);
