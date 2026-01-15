@@ -23,7 +23,7 @@ jobs:
       - name: Deploy code
         run: |
           ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-            cd /home/master/applications/YOUR_APP_ID/public_html
+            cd /home/master/applications/kjbhnqcgbp/public_html
             git pull origin main
             pm2 restart all
           EOF
