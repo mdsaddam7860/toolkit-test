@@ -10,5 +10,8 @@ app.get("/", async (req, res) => {
   await testFunction();
   res.send(`Servers running on PORT:${process.env.PORT}`);
 });
+app.get("/health", async (req, res) => {
+  res.send(`Servers running on PORT:${process.env.PORT} : Health is OK`);
+});
 
 export { app };
