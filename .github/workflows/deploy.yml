@@ -16,14 +16,20 @@ jobs:
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.CLOUDWAYS_SSH_KEY }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.CLOUDWAYS_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Deploy to Cloudways
+          if [ -n "${{ secrets.SERVER_IP }}" ]; then
+            ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+          else
+            echo "Error: SERVER_IP secret is empty!"
+            exit 1
+          fi
+
+      - name: Deploy code to Cloudways
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.CLOUDWAYS_USER }}@${{ secrets.CLOUDWAYS_HOST }} << 'EOF'
-            cd /home/1418358.cloudwaysapps.com/jretbrvprn/public_html
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+            cd /home/master/applications/kjbhnqcgbp/public_html/toolkit-test
 
             # Load NVM + Node environment
             export NVM_DIR="$HOME/.nvm"
@@ -31,13 +37,17 @@ jobs:
             [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
             echo "Pulling latest code..."
-            git pull origin main
+            if [ -d ".git" ]; then
+              git pull origin main
+            else
+              echo "Not a git repo, skipping git pull"
+            fi
 
             echo "Installing dependencies..."
             npm install --production
 
             echo "Restarting PM2 app..."
-            pm2 restart intermedia || pm2 start ecosystem.config.js
+            pm2 restart all || pm2 start ecosystem.config.js
 
             echo "Deployment completed!"
           EOF
