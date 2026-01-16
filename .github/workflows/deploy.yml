@@ -16,14 +16,28 @@ jobs:
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.CLOUDWAYS_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H ${{ secrets.CLOUDWAYS_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Deploy code
+      - name: Deploy to Cloudways
         run: |
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -T ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-            cd /home/master/applications/kjbhnqcgbp/public_html/toolkit-test
+          ssh -o StrictHostKeyChecking=no ${{ secrets.CLOUDWAYS_USER }}@${{ secrets.CLOUDWAYS_HOST }} << 'EOF'
+            cd /home/1418358.cloudwaysapps.com/jretbrvprn/public_html
+
+            # Load NVM + Node environment
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
+            echo "Pulling latest code..."
             git pull origin main
-            pm2 restart all
+
+            echo "Installing dependencies..."
+            npm install --production
+
+            echo "Restarting PM2 app..."
+            pm2 restart intermedia || pm2 start ecosystem.config.js
+
+            echo "Deployment completed!"
           EOF
